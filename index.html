@@ -7,6 +7,7 @@
     body { font-family: sans-serif; direction: rtl; padding: 20px; }
     label, input, select { display: block; margin-bottom: 10px; }
     h3 { margin-top: 20px; }
+    input[type="text"] { direction: rtl; }
   </style>
 </head>
 <body>
@@ -20,18 +21,18 @@
 
   <h3>נסיעה הלוך</h3>
   <label>מוצא:</label>
-  <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון">
+  <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
   <label>יעד:</label>
-  <input type="text" id="destination" placeholder="הראה 264 רמת גן">
+  <input type="text" id="destination" placeholder="הראה 264 רמת גן" autocomplete="off">
   <label>שעת יציאה:</label>
   <input type="time" id="departureTime">
 
   <div id="returnSection" style="display: none;">
     <h3>נסיעה חזור</h3>
     <label>מוצא חזור:</label>
-    <input type="text" id="returnOrigin" placeholder="הראה 264 רמת גן">
+    <input type="text" id="returnOrigin" placeholder="הראה 264 רמת גן" autocomplete="off">
     <label>יעד חזור:</label>
-    <input type="text" id="returnDestination" placeholder="תל חי 6 ראשון לציון">
+    <input type="text" id="returnDestination" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
     <label>שעת חזור:</label>
     <input type="time" id="returnTime">
   </div>
@@ -123,21 +124,34 @@
       }
     }
 
+    // Autocomplete handling
+    let autocompletes = {};
+
     function initAutocomplete() {
-      const ids = ["origin", "destination", "returnOrigin", "returnDestination"];
-      ids.forEach(id => {
+      const fields = ["origin", "destination", "returnOrigin", "returnDestination"];
+
+      fields.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
-          new google.maps.places.Autocomplete(input, {
-            types: ["geocode"],
-            language: "he"
+          const autocomplete = new google.maps.places.Autocomplete(input, {
+            types: ["geocode"]
+          });
+
+          autocomplete.setComponentRestrictions({ country: ["il"] });
+
+          autocompletes[id] = autocomplete;
+
+          autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+              console.warn("No geometry for selected place:", input.value);
+            }
           });
         }
       });
     }
   </script>
 
-  <!-- Google Maps JavaScript API -->
   <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I&libraries=places&callback=initAutocomplete">
   </script>
