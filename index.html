@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>מחשבון נסיעות</title>
+  <style>
+    body { font-family: sans-serif; direction: rtl; padding: 20px; }
+    label, input, select { display: block; margin-bottom: 10px; }
+    h3 { margin-top: 20px; }
+  </style>
 </head>
 <body>
   <h2>חישוב נסיעה</h2>
@@ -11,87 +16,97 @@
   <select id="tripType" onchange="toggleReturn()">
     <option value="oneway">הלוך</option>
     <option value="roundtrip">הלוך וחזור</option>
-  </select><br><br>
+  </select>
 
   <h3>נסיעה הלוך</h3>
   <label>מוצא:</label>
-  <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון"><br>
+  <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון">
   <label>יעד:</label>
-  <input type="text" id="destination" placeholder="הראה 264 רמת גן"><br>
+  <input type="text" id="destination" placeholder="הראה 264 רמת גן">
   <label>שעת יציאה:</label>
-  <input type="time" id="departureTime"><br><br>
+  <input type="time" id="departureTime">
 
-  <div id="returnSection" style="display:none">
+  <div id="returnSection" style="display: none;">
     <h3>נסיעה חזור</h3>
     <label>שעת חזור:</label>
-    <input type="time" id="returnTime"><br><br>
+    <input type="time" id="returnTime">
   </div>
 
+  <br>
   <button onclick="calculateTrip()">חשב</button>
 
   <h3>תוצאה:</h3>
   <div id="result"></div>
 
-  <script>
-    const apiKey = "AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I";
+  <!-- Load the Maps JavaScript API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I&libraries=places"></script>
 
+  <script>
     function toggleReturn() {
       const type = document.getElementById("tripType").value;
-      document.getElementById("returnSection").style.display = type === "roundtrip" ? "block" : "none";
+      document.getElementById("returnSection").style.display = (type === "roundtrip") ? "block" : "none";
     }
 
-    async function getDistanceAndTime(origin, destination) {
-      const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${apiKey}&language=he`;
-      const proxy = `https://cors-anywhere.herokuapp.com/`; // Browser-only fix (optional)
-
-      const response = await fetch(proxy + url);
-      const data = await response.json();
-      return data.rows[0].elements[0];
+    function getRoute(origin, destination) {
+      return new Promise((resolve, reject) => {
+        const service = new google.maps.DirectionsService();
+        service.route({
+          origin: origin,
+          destination: destination,
+          travelMode: 'DRIVING'
+        }, (result, status) => {
+          if (status === 'OK') {
+            const route = result.routes[0].legs[0];
+            resolve({
+              distance: route.distance.value,
+              duration: route.duration.value
+            });
+          } else {
+            reject('החישוב נכשל: ' + status);
+          }
+        });
+      });
     }
 
     async function calculateTrip() {
       const origin = document.getElementById("origin").value;
       const destination = document.getElementById("destination").value;
       const tripType = document.getElementById("tripType").value;
-
       const departureTime = document.getElementById("departureTime").value;
       const returnTime = document.getElementById("returnTime").value;
 
-      const goTrip = await getDistanceAndTime(origin, destination);
-      if (goTrip.status !== "OK") {
-        document.getElementById("result").innerText = "שגיאה בכתובות.";
-        return;
-      }
+      document.getElementById("result").innerText = "מחשב...";
 
-      let totalDistance = goTrip.distance.value; // meters
-      let totalDuration = goTrip.duration.value; // seconds
+      try {
+        let go = await getRoute(origin, destination);
+        let totalDistance = go.distance;
+        let totalDuration = go.duration;
 
-      if (tripType === "roundtrip") {
-        const returnTrip = await getDistanceAndTime(destination, origin);
-        if (returnTrip.status !== "OK") {
-          document.getElementById("result").innerText = "שגיאה בנסיעת חזור.";
-          return;
+        if (tripType === 'roundtrip') {
+          let back = await getRoute(destination, origin);
+          totalDistance += back.distance;
+          totalDuration += back.duration;
         }
-        totalDistance += returnTrip.distance.value;
-        totalDuration += returnTrip.duration.value;
+
+        const km = (totalDistance / 1000).toFixed(1);
+        const travelMinutes = Math.round(totalDuration / 60);
+
+        let stayMinutes = 0;
+        if (tripType === 'roundtrip' && departureTime && returnTime) {
+          const dep = new Date(`2000-01-01T${departureTime}:00`);
+          const ret = new Date(`2000-01-01T${returnTime}:00`);
+          const diff = (ret - dep) / (1000 * 60);
+          stayMinutes = diff - travelMinutes;
+          if (stayMinutes < 0) stayMinutes = 0;
+        }
+
+        document.getElementById("result").innerHTML =
+          `ק״מ משוכלל: ${km} ק״מ<br>` +
+          `זמן נסיעה כולל: ${travelMinutes} דקות<br>` +
+          (tripType === "roundtrip" ? `זמן שהייה: ${stayMinutes} דקות` : "");
+      } catch (err) {
+        document.getElementById("result").innerText = err;
       }
-
-      const km = (totalDistance / 1000).toFixed(1);
-      const travelMinutes = Math.round(totalDuration / 60);
-
-      // Calculate stay time
-      let stayMinutes = 0;
-      if (tripType === "roundtrip" && departureTime && returnTime) {
-        const dep = new Date(`2000-01-01T${departureTime}:00`);
-        const ret = new Date(`2000-01-01T${returnTime}:00`);
-        const diff = (ret - dep) / (1000 * 60);
-        stayMinutes = diff - travelMinutes;
-      }
-
-      document.getElementById("result").innerHTML =
-        `ק״מ משוכלל: ${km} ק״מ<br>` +
-        `זמן נסיעה כולל: ${travelMinutes} דקות<br>` +
-        (tripType === "roundtrip" ? `זמן שהייה: ${stayMinutes > 0 ? stayMinutes : 0} דקות<br>` : '');
     }
   </script>
 </body>
