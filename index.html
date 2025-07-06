@@ -124,27 +124,25 @@
       }
     }
 
-    // Autocomplete handling
-    let autocompletes = {};
-
+    // Improved Autocomplete with full place validation
     function initAutocomplete() {
-      const fields = ["origin", "destination", "returnOrigin", "returnDestination"];
+      const inputs = ["origin", "destination", "returnOrigin", "returnDestination"];
 
-      fields.forEach(id => {
+      inputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
           const autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ["geocode"]
+            types: ["geocode"],
+            fields: ["place_id", "geometry", "formatted_address", "name"]
           });
 
           autocomplete.setComponentRestrictions({ country: ["il"] });
 
-          autocompletes[id] = autocomplete;
-
           autocomplete.addListener("place_changed", () => {
             const place = autocomplete.getPlace();
+            console.log(`Selected for #${id}:`, place);
             if (!place.geometry) {
-              console.warn("No geometry for selected place:", input.value);
+              alert(`לא ניתן למצוא מיקום עבור: ${input.value}`);
             }
           });
         }
