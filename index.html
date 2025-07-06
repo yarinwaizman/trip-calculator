@@ -47,6 +47,10 @@
     function toggleReturn() {
       const type = document.getElementById("tripType").value;
       document.getElementById("returnSection").style.display = (type === "roundtrip") ? "block" : "none";
+      if (type === "roundtrip") {
+        document.getElementById("returnOrigin").value = document.getElementById("destination").value;
+        document.getElementById("returnDestination").value = document.getElementById("origin").value;
+      }
     }
 
     function getRoute(origin, destination) {
@@ -93,8 +97,9 @@
         let totalDistance = go.distance;
         let totalDuration = go.duration;
 
+        let back;
         if (tripType === 'roundtrip') {
-          let back = await getRoute(returnOrigin, returnDestination);
+          back = await getRoute(returnOrigin, returnDestination);
           totalDistance += back.distance;
           totalDuration += back.duration;
         }
@@ -108,7 +113,8 @@
           const dep = new Date(`2000-01-01T${departureTime}:00`);
           const ret = new Date(`2000-01-01T${returnTime}:00`);
           const diffMinutes = (ret - dep) / (1000 * 60);
-          totalTimeFormatted = formatMinutesToTime(diffMinutes);
+          const totalWithReturn = diffMinutes + back.duration / 60;
+          totalTimeFormatted = formatMinutesToTime(totalWithReturn);
         }
 
         document.getElementById("result").innerHTML =
