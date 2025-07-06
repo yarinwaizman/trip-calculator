@@ -28,6 +28,10 @@
 
   <div id="returnSection" style="display: none;">
     <h3>נסיעה חזור</h3>
+    <label>מוצא חזור:</label>
+    <input type="text" id="returnOrigin" placeholder="הראה 264 רמת גן">
+    <label>יעד חזור:</label>
+    <input type="text" id="returnDestination" placeholder="תל חי 6 ראשון לציון">
     <label>שעת חזור:</label>
     <input type="time" id="returnTime">
   </div>
@@ -37,9 +41,6 @@
 
   <h3>תוצאה:</h3>
   <div id="result"></div>
-
-  <!-- Load the Maps JavaScript API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I&libraries=places"></script>
 
   <script>
     function toggleReturn() {
@@ -68,12 +69,21 @@
       });
     }
 
+    function formatMinutesToTime(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${hours > 0 ? hours + ' שעות ' : ''}${mins} דקות`;
+    }
+
     async function calculateTrip() {
       const origin = document.getElementById("origin").value;
       const destination = document.getElementById("destination").value;
       const tripType = document.getElementById("tripType").value;
       const departureTime = document.getElementById("departureTime").value;
       const returnTime = document.getElementById("returnTime").value;
+
+      const returnOrigin = document.getElementById("returnOrigin").value || destination;
+      const returnDestination = document.getElementById("returnDestination").value || origin;
 
       document.getElementById("result").innerText = "מחשב...";
 
@@ -83,31 +93,53 @@
         let totalDuration = go.duration;
 
         if (tripType === 'roundtrip') {
-          let back = await getRoute(destination, origin);
+          let back = await getRoute(returnOrigin, returnDestination);
           totalDistance += back.distance;
           totalDuration += back.duration;
         }
 
         const km = (totalDistance / 1000).toFixed(1);
         const travelMinutes = Math.round(totalDuration / 60);
+        const travelFormatted = formatMinutesToTime(travelMinutes);
 
         let stayMinutes = 0;
+        let stayFormatted = '';
+
         if (tripType === 'roundtrip' && departureTime && returnTime) {
           const dep = new Date(`2000-01-01T${departureTime}:00`);
           const ret = new Date(`2000-01-01T${returnTime}:00`);
           const diff = (ret - dep) / (1000 * 60);
           stayMinutes = diff - travelMinutes;
           if (stayMinutes < 0) stayMinutes = 0;
+          stayFormatted = formatMinutesToTime(stayMinutes);
         }
 
         document.getElementById("result").innerHTML =
           `ק״מ משוכלל: ${km} ק״מ<br>` +
-          `זמן נסיעה כולל: ${travelMinutes} דקות<br>` +
-          (tripType === "roundtrip" ? `זמן שהייה: ${stayMinutes} דקות` : "");
+          `זמן נסיעה כולל: ${travelFormatted}<br>` +
+          (tripType === "roundtrip" ? `זמן שהייה: ${stayFormatted}` : "");
       } catch (err) {
         document.getElementById("result").innerText = err;
       }
     }
+
+    function initAutocomplete() {
+      const ids = ["origin", "destination", "returnOrigin", "returnDestination"];
+      ids.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          new google.maps.places.Autocomplete(input, {
+            types: ["geocode"],
+            language: "he"
+          });
+        }
+      });
+    }
+  </script>
+
+  <!-- Google Maps JavaScript API -->
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I&libraries=places&callback=initAutocomplete">
   </script>
 </body>
 </html>
