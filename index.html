@@ -103,22 +103,18 @@
         const travelMinutes = Math.round(totalDuration / 60);
         const travelFormatted = formatMinutesToTime(travelMinutes);
 
-        let stayMinutes = 0;
-        let stayFormatted = '';
-
+        let totalTimeFormatted = '';
         if (tripType === 'roundtrip' && departureTime && returnTime) {
           const dep = new Date(`2000-01-01T${departureTime}:00`);
           const ret = new Date(`2000-01-01T${returnTime}:00`);
-          const diff = (ret - dep) / (1000 * 60);
-          stayMinutes = diff - travelMinutes;
-          if (stayMinutes < 0) stayMinutes = 0;
-          stayFormatted = formatMinutesToTime(stayMinutes);
+          const diffMinutes = (ret - dep) / (1000 * 60);
+          totalTimeFormatted = formatMinutesToTime(diffMinutes);
         }
 
         document.getElementById("result").innerHTML =
           `ק״מ משוכלל: ${km} ק״מ<br>` +
           `זמן נסיעה כולל: ${travelFormatted}<br>` +
-          (tripType === "roundtrip" ? `זמן שהייה: ${stayFormatted}` : "");
+          (tripType === "roundtrip" ? `זמן כולל: ${totalTimeFormatted}` : "");
       } catch (err) {
         document.getElementById("result").innerText = err;
       }
