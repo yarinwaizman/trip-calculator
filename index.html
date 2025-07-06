@@ -114,7 +114,7 @@
           const ret = new Date(`2000-01-01T${returnTime}:00`);
           const diffMinutes = (ret - dep) / (1000 * 60);
           const totalWithReturn = diffMinutes + back.duration / 60;
-          totalTimeFormatted = formatMinutesToTime(totalWithReturn);
+          totalTimeFormatted = formatMinutesToTime(Math.round(totalWithReturn));
         }
 
         document.getElementById("result").innerHTML =
