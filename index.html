@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>מחשבון נסיעות</title>
+</head>
+<body>
+  <h2>חישוב נסיעה</h2>
+
+  <label>סוג נסיעה:</label>
+  <select id="tripType" onchange="toggleReturn()">
+    <option value="oneway">הלוך</option>
+    <option value="roundtrip">הלוך וחזור</option>
+  </select><br><br>
+
+  <h3>נסיעה הלוך</h3>
+  <label>מוצא:</label>
+  <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון"><br>
+  <label>יעד:</label>
+  <input type="text" id="destination" placeholder="הראה 264 רמת גן"><br>
+  <label>שעת יציאה:</label>
+  <input type="time" id="departureTime"><br><br>
+
+  <div id="returnSection" style="display:none">
+    <h3>נסיעה חזור</h3>
+    <label>שעת חזור:</label>
+    <input type="time" id="returnTime"><br><br>
+  </div>
+
+  <button onclick="calculateTrip()">חשב</button>
+
+  <h3>תוצאה:</h3>
+  <div id="result"></div>
+
+  <script>
+    const apiKey = AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I;
+
+    function toggleReturn() {
+      const type = document.getElementById("tripType").value;
+      document.getElementById("returnSection").style.display = type === "roundtrip" ? "block" : "none";
+    }
+
+    async function getDistanceAndTime(origin, destination) {
+      const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${apiKey}&language=he`;
+      const proxy = `https://cors-anywhere.herokuapp.com/`; // Browser-only fix (optional)
+
+      const response = await fetch(proxy + url);
+      const data = await response.json();
+      return data.rows[0].elements[0];
+    }
+
+    async function calculateTrip() {
+      const origin = document.getElementById("origin").value;
+      const destination = document.getElementById("destination").value;
+      const tripType = document.getElementById("tripType").value;
+
+      const departureTime = document.getElementById("departureTime").value;
+      const returnTime = document.getElementById("returnTime").value;
+
+      const goTrip = await getDistanceAndTime(origin, destination);
+      if (goTrip.status !== "OK") {
+        document.getElementById("result").innerText = "שגיאה בכתובות.";
+        return;
+      }
+
+      let totalDistance = goTrip.distance.value; // meters
+      let totalDuration = goTrip.duration.value; // seconds
+
+      if (tripType === "roundtrip") {
+        const returnTrip = await getDistanceAndTime(destination, origin);
+        if (returnTrip.status !== "OK") {
+          document.getElementById("result").innerText = "שגיאה בנסיעת חזור.";
+          return;
+        }
+        totalDistance += returnTrip.distance.value;
+        totalDuration += returnTrip.duration.value;
+      }
+
+      const km = (totalDistance / 1000).toFixed(1);
+      const travelMinutes = Math.round(totalDuration / 60);
+
+      // Calculate stay time
+      let stayMinutes = 0;
+      if (tripType === "roundtrip" && departureTime && returnTime) {
+        const dep = new Date(`2000-01-01T${departureTime}:00`);
+        const ret = new Date(`2000-01-01T${returnTime}:00`);
+        const diff = (ret - dep) / (1000 * 60);
+        stayMinutes = diff - travelMinutes;
+      }
+
+      document.getElementById("result").innerHTML =
+        `ק״מ משוכלל: ${km} ק״מ<br>` +
+        `זמן נסיעה כולל: ${travelMinutes} דקות<br>` +
+        (tripType === "roundtrip" ? `זמן שהייה: ${stayMinutes > 0 ? stayMinutes : 0} דקות<br>` : '');
+    }
+  </script>
+</body>
+</html>
