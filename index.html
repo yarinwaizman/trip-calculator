@@ -3,80 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <title>מחשבון נסיעות</title>
-  <style>
-    body { font-family: sans-serif; direction: rtl; padding: 20px; }
-    label, input, select { display: block; margin-bottom: 10px; }
-    h3 { margin-top: 20px; }
-    input[type="text"] { direction: rtl; }
-    .stop { width: 100%; margin-bottom: 10px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>חישוב נסיעה</h2>
+  <h2>מחשבון נסיעות</h2>
 
-  <label>סוג נסיעה:</label>
-  <select id="tripType" onchange="toggleReturn()">
-    <option value="oneway">הלוך</option>
-    <option value="roundtrip">הלוך וחזור</option>
-  </select>
+  <div class="trip-section">
+    <h3>מסלול הלוך</h3>
+    <div class="form-grid">
+      <div>
+        <label>שעה</label>
+        <input type="time" id="departureTime">
+      </div>
+      <div>
+        <label>נקודת מוצא</label>
+        <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
+      </div>
+      <div>
+        <label>נקודת יעד</label>
+        <input type="text" id="destination" placeholder="הראה 264 רמת גן" autocomplete="off">
+      </div>
+    </div>
 
-  <h3>נסיעה הלוך</h3>
-  <label>מוצא:</label>
-  <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
-  <h3>עצירות בדרך</h3>
-  <div id="stops-container">
-    <input type="text" class="stop" placeholder="עצירה בדרך" autocomplete="off">
-  </div>
-  <button type="button" onclick="addStop()">+ הוסף עצירה</button>
-  <label>יעד:</label>
-  <input type="text" id="destination" placeholder="הראה 264 רמת גן" autocomplete="off">
-  <label>שעת יציאה:</label>
-  <input type="time" id="departureTime">
-
-
-  <div id="returnSection" style="display: none;">
-    <h3>נסיעה חזור</h3>
-    <label>מוצא חזור:</label>
-    <input type="text" id="returnOrigin" placeholder="הראה 264 רמת גן" autocomplete="off">
-    <label>יעד חזור:</label>
-    <input type="text" id="returnDestination" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
-    <label>שעת חזור:</label>
-    <input type="time" id="returnTime">
+    <label>נקודות עצירה</label>
+    <div id="stops-container">
+      <div class="stop-wrapper">
+        <input type="text" class="stop" placeholder="עצירה בדרך" autocomplete="off">
+      </div>
+    </div>
+    <button type="button" class="add-stop-btn" onclick="addStop()">+ הוספת עצירה</button>
   </div>
 
-  <br>
+  <div class="trip-section" id="returnSection" style="display: none;">
+    <h3>מסלול חזור</h3>
+    <div class="form-grid">
+      <div>
+        <label>שעה</label>
+        <input type="time" id="returnTime">
+      </div>
+      <div>
+        <label>נקודת מוצא</label>
+        <input type="text" id="returnOrigin" placeholder="הראה 264 רמת גן" autocomplete="off">
+      </div>
+      <div>
+        <label>נקודת יעד</label>
+        <input type="text" id="returnDestination" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
   <button onclick="calculateTrip()">חשב</button>
 
   <h3>תוצאה:</h3>
   <div id="result"></div>
 
-<script>
-  function addStop() {
-    const container = document.getElementById("stops-container");
-    const input = document.createElement("input");
-    input.type = "text";
-    input.className = "stop";
-    input.placeholder = "עצירה בדרך";
-    input.autocomplete = "off";
-    container.appendChild(input);
+  <script>
+    function addStop() {
+      const container = document.getElementById("stops-container");
+      const wrapper = document.createElement("div");
+      wrapper.className = "stop-wrapper";
 
-    const autocomplete = new google.maps.places.Autocomplete(input, {
-      types: ["geocode"],
-      fields: ["place_id", "geometry", "formatted_address", "name"]
-    });
-    autocomplete.setComponentRestrictions({ country: ["il"] });
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "stop";
+      input.placeholder = "עצירה בדרך";
+      input.autocomplete = "off";
 
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      if (!place.geometry) {
-        alert(`לא ניתן למצוא מיקום עבור: ${input.value}`);
-      }
-    });
-  }
-</script>
-<script src="script.js"></script>
-<script defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I&libraries=places&callback=initAutocomplete">
-</script>
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "remove-stop";
+      removeBtn.innerHTML = "🗑️";
+      removeBtn.onclick = () => container.removeChild(wrapper);
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(removeBtn);
+      container.appendChild(wrapper);
+
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ["geocode"],
+        fields: ["place_id", "geometry", "formatted_address", "name"]
+      });
+      autocomplete.setComponentRestrictions({ country: ["il"] });
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) {
+          alert(`לא ניתן למצוא מיקום עבור: ${input.value}`);
+        }
+      });
+    }
+  </script>
+
+  <script src="script.js"></script>
+  <script defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I&libraries=places&callback=initAutocomplete">
+  </script>
 </body>
 </html>
