@@ -43,7 +43,7 @@ input[type="text"], input[type="time"], select {
   align-items: center;
   gap: 10px;
 }
-.stop {
+.stop, .return-stop {
   flex: 1;
   margin-bottom: 10px;
 }

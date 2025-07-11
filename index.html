@@ -55,6 +55,14 @@
         <input type="text" id="returnDestination" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
       </div>
     </div>
+
+    <label>נקודות עצירה</label>
+    <div id="return-stops-container">
+      <div class="stop-wrapper">
+        <input type="text" class="return-stop" placeholder="עצירה בדרך" autocomplete="off">
+      </div>
+    </div>
+    <button type="button" class="add-stop-btn" onclick="addStop('return-stops-container', 'return-stop')">+ הוספת עצירה</button>
   </div>
 
   <button onclick="calculateTrip()">חשב</button>
@@ -63,14 +71,14 @@
   <div id="result"></div>
 
   <script>
-    function addStop() {
-      const container = document.getElementById("stops-container");
+    function addStop(containerId = "stops-container", stopClass = "stop") {
+      const container = document.getElementById(containerId);
       const wrapper = document.createElement("div");
       wrapper.className = "stop-wrapper";
 
       const input = document.createElement("input");
       input.type = "text";
-      input.className = "stop";
+      input.className = stopClass;
       input.placeholder = "עצירה בדרך";
       input.autocomplete = "off";
 
