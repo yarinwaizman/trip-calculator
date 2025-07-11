@@ -8,6 +8,7 @@
     label, input, select { display: block; margin-bottom: 10px; }
     h3 { margin-top: 20px; }
     input[type="text"] { direction: rtl; }
+    .stop { width: 100%; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -22,16 +23,16 @@
   <h3>נסיעה הלוך</h3>
   <label>מוצא:</label>
   <input type="text" id="origin" placeholder="תל חי 6 ראשון לציון" autocomplete="off">
-  <label>יעד:</label>
-  <input type="text" id="destination" placeholder="הראה 264 רמת גן" autocomplete="off">
-  <label>שעת יציאה:</label>
-  <input type="time" id="departureTime">
-
   <h3>עצירות בדרך</h3>
   <div id="stops-container">
     <input type="text" class="stop" placeholder="עצירה בדרך" autocomplete="off">
   </div>
   <button type="button" onclick="addStop()">+ הוסף עצירה</button>
+  <label>יעד:</label>
+  <input type="text" id="destination" placeholder="הראה 264 רמת גן" autocomplete="off">
+  <label>שעת יציאה:</label>
+  <input type="time" id="departureTime">
+
 
   <div id="returnSection" style="display: none;">
     <h3>נסיעה חזור</h3>
@@ -49,7 +50,6 @@
   <h3>תוצאה:</h3>
   <div id="result"></div>
 
-</script>
 <script>
   function addStop() {
     const container = document.getElementById("stops-container");

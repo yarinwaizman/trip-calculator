@@ -119,3 +119,28 @@ function initAutocomplete() {
 
 // Make initAutocomplete globally available for Google Maps callback
 window.initAutocomplete = initAutocomplete;
+
+// Add stop input dynamically with autocomplete and styling
+function addStop() {
+  const container = document.getElementById("stops-container");
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "עצירה בדרך";
+  input.autocomplete = "off";
+  input.className = "stop";
+  input.style.width = "100%";
+  input.style.marginBottom = "10px";
+  container.appendChild(input);
+
+  const autocomplete = new google.maps.places.Autocomplete(input, {
+    types: ["geocode"],
+    fields: ["place_id", "geometry", "formatted_address", "name"]
+  });
+  autocomplete.setComponentRestrictions({ country: ["il"] });
+  autocomplete.addListener("place_changed", () => {
+    const place = autocomplete.getPlace();
+    if (!place.geometry) {
+      alert(`לא ניתן למצוא מיקום עבור: ${input.value}`);
+    }
+  });
+}
