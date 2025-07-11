@@ -109,5 +109,11 @@
   <script defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAasX9VHsRF10ps6XvhD26eaTLm-torj1I&libraries=places&callback=initAutocomplete">
   </script>
+  <footer style="text-align: center; margin-top: 40px; color: #ccc; font-size: 0.9em;">
+    כל הזכויות שמורות לירין ויצמן © <span id="year"></span>
+  </footer>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

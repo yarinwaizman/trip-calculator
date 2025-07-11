@@ -93,3 +93,16 @@ button[onclick="calculateTrip()"] {
 button[onclick="calculateTrip()"]:hover {
   background: #00c8c3;
 }
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  color: #ccc;
+  font-size: 0.9em;
+}
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  color: #ccc;
+  font-size: 0.9em;
+}
