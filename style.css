@@ -34,7 +34,7 @@ label {
   margin-bottom: 4px;
   color: #ffffff;
 }
-input[type="text"], input[type="time"], select {
+input[type="text"], input[type="time"] {
   width: 100%;
   padding: 8px;
   font-size: 1em;
@@ -43,6 +43,24 @@ input[type="text"], input[type="time"], select {
   border-radius: 5px;
   background-color: white;
   color: #141F48;
+}
+
+select {
+  width: 100%;
+  padding: 8px;
+  font-size: 1em;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  color: #141F48;
+  appearance: none;
+}
+
+select:focus {
+  outline: none;
+  border-color: #00e0dc;
+  box-shadow: 0 0 5px #00e0dc;
 }
 .stop-wrapper {
   display: flex;
