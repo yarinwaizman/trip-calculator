@@ -1,12 +1,13 @@
 body {
-  font-family: sans-serif;
+  font-family: 'Heebo', sans-serif;
   direction: rtl;
   padding: 20px;
-  background: #f9f9f9;
+  background: #141F48;
+  color: white;
 }
 .trip-section {
-  background: white;
-  border: 1px solid #ccc;
+  background: #1d2a5b;
+  border: 1px solid #2e3a69;
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
@@ -16,7 +17,7 @@ body {
   align-items: center;
   font-size: 1.2em;
   margin-bottom: 20px;
-  color: #0a66c2;
+  color: #00e0dc;
 }
 .trip-section h3::before {
   content: "📅";
@@ -31,12 +32,17 @@ body {
 label {
   font-size: 0.9em;
   margin-bottom: 4px;
+  color: #ffffff;
 }
 input[type="text"], input[type="time"], select {
   width: 100%;
   padding: 8px;
   font-size: 1em;
   box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  color: #141F48;
 }
 .stop-wrapper {
   display: flex;
@@ -54,11 +60,18 @@ input[type="text"], input[type="time"], select {
   cursor: pointer;
   color: red;
 }
-.add-stop-btn {
+.add-stop-btn,
+button[onclick="calculateTrip()"] {
   padding: 8px 16px;
   font-size: 0.9em;
   border-radius: 20px;
-  border: 1px solid #ccc;
-  background: #f1f1f1;
+  border: none;
+  background: #00e0dc;
+  color: #141F48;
+  font-weight: bold;
   cursor: pointer;
+}
+.add-stop-btn:hover,
+button[onclick="calculateTrip()"]:hover {
+  background: #00c8c3;
 }
