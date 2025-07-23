@@ -10,10 +10,10 @@
 
   <div class="trip-section">
     <label>סוג נסיעה:</label>
-<select id="tripType" onchange="toggleReturn()">
-  <option value="oneway">הלוך</option>
-  <option value="roundtrip">הלוך וחזור</option>
-</select>
+    <div id="tripType" data-value="oneway">
+      <button id="onewayBtn" onclick="toggleReturn('oneway')">הלוך בלבד</button>
+      <button id="roundtripBtn" onclick="toggleReturn('roundtrip')">הלוך וחזור</button>
+    </div>
     <h3>מסלול הלוך</h3>
     <div class="form-grid">
       <div>
@@ -63,6 +63,7 @@
       </div>
     </div>
     <button type="button" class="add-stop-btn" onclick="addStop('return-stops-container', 'return-stop')">+ הוספת עצירה</button>
+    <button type="button" onclick="applyReverseRoute()">החל מסלול חזור</button>
   </div>
 
   <button onclick="calculateTrip()">חשב</button>

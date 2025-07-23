@@ -1,7 +1,18 @@
-function toggleReturn() {
-  const type = document.getElementById("tripType").value;
-  document.getElementById("returnSection").style.display = (type === "roundtrip") ? "block" : "none";
-  if (type === "roundtrip") {
+function toggleReturn(type = null) {
+  if (!type) {
+    type = document.getElementById("tripType").dataset.value;
+  } else {
+    document.getElementById("tripType").dataset.value = type;
+  }
+
+  const isRoundTrip = type === "roundtrip";
+  document.getElementById("returnSection").style.display = isRoundTrip ? "block" : "none";
+
+  // Update button states
+  document.getElementById("onewayBtn").classList.toggle("selected", !isRoundTrip);
+  document.getElementById("roundtripBtn").classList.toggle("selected", isRoundTrip);
+
+  if (isRoundTrip) {
     document.getElementById("returnOrigin").value = document.getElementById("destination").value;
     document.getElementById("returnDestination").value = document.getElementById("origin").value;
   }
@@ -171,5 +182,24 @@ function addStop(containerId = "stops-container", stopClass = "stop") {
     if (!place.geometry) {
       alert(`לא ניתן למצוא מיקום עבור: ${input.value}`);
     }
+  });
+}
+
+// Reverse the outbound trip into the return trip
+function applyReverseRoute() {
+  document.getElementById("returnOrigin").value = document.getElementById("destination").value;
+  document.getElementById("returnDestination").value = document.getElementById("origin").value;
+
+  // Copy stops in reverse order
+  const stops = Array.from(document.querySelectorAll(".stop"))
+    .map(el => el.value)
+    .filter(val => val.trim() !== "")
+    .reverse();
+
+  const container = document.getElementById("return-stops-container");
+  container.innerHTML = "";
+  stops.forEach(val => {
+    addStop("return-stops-container", "return-stop");
+    container.lastChild.value = val;
   });
 }

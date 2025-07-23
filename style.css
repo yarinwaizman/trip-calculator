@@ -106,3 +106,60 @@ footer {
   color: #ccc;
   font-size: 0.9em;
 }
+/* Trip type toggle buttons styling */
+#tripType {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#tripType button {
+  padding: 8px 16px;
+  font-size: 0.9em;
+  border-radius: 20px;
+  border: none;
+  background: #2e3a69;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#tripType button.selected {
+  background: #00e0dc;
+  color: #141F48;
+}
+
+#tripType button:hover {
+  background: #00c8c3;
+}
+
+button[onclick="applyReverseRoute()"] {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  border-radius: 20px;
+  border: none;
+  background: #00e0dc;
+  color: #141F48;
+  font-weight: bold;
+  cursor: pointer;
+}
+/* Animation effect for trip type button */
+#tripType button {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#tripType button.selected {
+  animation: buttonFade 0.3s ease-in-out;
+}
+
+@keyframes buttonFade {
+  from {
+    background-color: #2e3a69;
+    color: #fff;
+  }
+  to {
+    background-color: #00e0dc;
+    color: #141F48;
+  }
+}
