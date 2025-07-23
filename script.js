@@ -51,7 +51,7 @@ function formatMinutesToTime(minutes) {
 async function calculateTrip() {
   const origin = document.getElementById("origin").value;
   const destination = document.getElementById("destination").value;
-  const tripType = document.getElementById("tripType").value;
+  const tripType = document.getElementById("tripType").dataset.value;
   const departureTime = document.getElementById("departureTime").value;
   const returnTime = document.getElementById("returnTime").value;
 
