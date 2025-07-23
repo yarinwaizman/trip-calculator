@@ -86,7 +86,10 @@ async function calculateTrip() {
     let totalTimeFormatted = '';
     if (tripType === 'roundtrip' && departureTime && returnTime) {
       const dep = new Date(`2000-01-01T${departureTime}:00`);
-      const ret = new Date(`2000-01-01T${returnTime}:00`);
+      let ret = new Date(`2000-01-01T${returnTime}:00`);
+      if (ret < dep) {
+        ret.setDate(ret.getDate() + 1); // Add a day if return is past midnight
+      }
       const diffMinutes = (ret - dep) / (1000 * 60);
       const totalWithReturn = diffMinutes + back.duration / 60;
       totalTimeFormatted = formatMinutesToTime(Math.round(totalWithReturn));
